@@ -13,9 +13,16 @@
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-16A34A?logo=typescript&logoColor=white" />
   <img alt="SQLite" src="https://img.shields.io/badge/SQLite-local%20storage-16A34A?logo=sqlite&logoColor=white" />
   <img alt="Platform" src="https://img.shields.io/badge/platform-Windows-16A34A" />
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-16A34A" /></a>
+  <a href="https://github.com/Tajammal-Maqbool/crawlwise-spider/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/Tajammal-Maqbool/crawlwise-spider?color=16A34A" /></a>
 </p>
 
 <p align="center">
+  <a href="https://github.com/Tajammal-Maqbool/crawlwise-spider/releases/latest"><strong>Download for Windows</strong></a>
+</p>
+
+<p align="center">
+  <a href="#download">Download</a> ·
   <a href="#features">Features</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#getting-started">Getting started</a> ·
@@ -42,6 +49,17 @@ These screenshots show a real crawl of [tajammalmaqbool.com](https://tajammalmaq
     <td align="center"><sub>Dark theme</sub></td>
   </tr>
 </table>
+
+## Download
+
+Get the latest Windows build from the [Releases page](https://github.com/Tajammal-Maqbool/crawlwise-spider/releases/latest).
+
+| File | Use it when |
+| --- | --- |
+| `Crawlwise-Spider-Setup-<version>.exe` | You want to install the app with Start menu and desktop shortcuts. |
+| `Crawlwise-Spider-<version>-portable.exe` | You want to run the app without installing it, for example from a USB drive. |
+
+The builds are not code-signed yet. Windows SmartScreen can show "Windows protected your PC". Click **More info**, then **Run anyway**.
 
 ## Features
 
@@ -88,6 +106,7 @@ Enter a URL in the address bar and click **Start**.
 | `npm run typecheck` | Check types with TypeScript. |
 | `npm test` | Run unit and integration tests. |
 | `npm run test:e2e` | Build the app and run end-to-end tests. |
+| `npm run dist` | Build the Windows installer and portable exe into `dist/`. |
 
 ## Command line
 
@@ -169,6 +188,24 @@ tests/        Unit, integration and end-to-end tests
 resources/    App icons
 ```
 
-## Author
+## About the author
 
-Built by [Tajammal Maqbool](https://tajammalmaqbool.com).
+<table>
+  <tr>
+    <td>
+      <strong>Tajammal Maqbool</strong>, Website &amp; Game Developer<br /><br />
+      I'm a software engineer who loves creating web applications and games. I work across the front end and the back end, with JavaScript, TypeScript, React, Node.js and Express. I also build games with Unity, Godot, Phaser 3, Three.js and Babylon.js.<br /><br />
+      I studied Computer Science at UET Lahore (2020 to 2024) and have freelanced since 2021, with 10+ jobs on Upwork and 200+ orders on Fiverr.
+      <br /><br />
+      <a href="https://tajammalmaqbool.com">Website</a> ·
+      <a href="https://tajammalmaqbool.com/resume.pdf">Resume</a> ·
+      <a href="https://github.com/Tajammal-Maqbool">GitHub</a> ·
+      <a href="https://tajammalmaqbool.itch.io">itch.io</a> ·
+      <a href="https://patreon.com/TajammalMaqbool">Patreon</a>
+    </td>
+  </tr>
+</table>
+
+## License
+
+Crawlwise Spider is released under the [MIT License](LICENSE). Copyright (c) 2026 Tajammal Maqbool.

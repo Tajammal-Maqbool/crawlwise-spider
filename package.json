@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
     "test:e2e": "electron-vite build && vitest run --config vitest.e2e.config.mts",
-    "cli": "node out/main/cli.js"
+    "cli": "node out/main/cli.js",
+    "dist": "electron-vite build && electron-builder --win nsis portable"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
@@ -20,6 +21,7 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
     "electron": "^44.9.2",
+    "electron-builder": "^26.18.0",
     "electron-vite": "^6.0.0",
     "playwright-core": "^1.64.1",
     "typescript": "^7.0.2",
@@ -39,5 +41,35 @@
   },
   "overrides": {
     "uuid": "^11.1.1"
+  },
+  "author": "Tajammal Maqbool",
+  "license": "MIT",
+  "homepage": "https://github.com/Tajammal-Maqbool/crawlwise-spider",
+  "build": {
+    "appId": "com.tajammalmaqbool.crawlwisespider",
+    "productName": "Crawlwise Spider",
+    "directories": {
+      "output": "dist",
+      "buildResources": "resources"
+    },
+    "files": [
+      "out/**",
+      "resources/**",
+      "package.json"
+    ],
+    "win": {
+      "icon": "resources/icon.ico",
+      "artifactName": "Crawlwise-Spider-${version}-${arch}-${target}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "shortcutName": "Crawlwise Spider",
+      "artifactName": "Crawlwise-Spider-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "Crawlwise-Spider-${version}-portable.${ext}"
+    }
   }
 }

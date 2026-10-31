@@ -1,6 +1,6 @@
 {
-  "name": "crawlwise",
-  "productName": "Crawlwise",
+  "name": "crawlwise-spider",
+  "productName": "Crawlwise Spider",
   "version": "0.1.0",
   "private": true,
   "description": "Desktop website crawler for technical SEO audits.",

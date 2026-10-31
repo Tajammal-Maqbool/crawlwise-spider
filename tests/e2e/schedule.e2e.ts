@@ -47,7 +47,7 @@ describe('scheduling', () => {
     expect(xml).toContain('Weekly &lt;check&gt; &amp; report')
     expect(buildTaskXml(task({ frequency: 'monthly' }), 'x')).toContain('<Day>21</Day>')
     expect(buildTaskXml(task({ frequency: 'once' }), 'x')).toContain('<TimeTrigger>')
-    expect(buildCreateArgs('abc', 'C:\\t.xml')).toEqual(['/Create', '/TN', 'Crawlwise\\abc', '/XML', 'C:\\t.xml', '/F'])
+    expect(buildCreateArgs('abc', 'C:\\t.xml')).toEqual(['/Create', '/TN', 'CrawlwiseSpider\\abc', '/XML', 'C:\\t.xml', '/F'])
   })
 
   it('rejects bad input', () => {

@@ -1,0 +1,1 @@
+export const RESPONSE_TIME_BUCKET_SECONDS = 10

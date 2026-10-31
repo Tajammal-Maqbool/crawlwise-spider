@@ -1,0 +1,126 @@
+:root,
+:root[data-theme='light'] {
+  --bg: #f3f3f3;
+  --bg-panel: #ffffff;
+  --bg-raised: #e9e9e9;
+  --bg-hover: #dcdcdc;
+  --bg-selected: #cdeed8;
+  --bg-header: #ececec;
+  --bg-row-alt: #f8f8f8;
+  --border: #c8c8c8;
+  --text: #1e1e1e;
+  --text-muted: #5f6368;
+  --accent: #16a34a;
+  --accent-text: #ffffff;
+  --tab-active: #ffffff;
+  --danger: #c62828;
+  --warning: #b26a00;
+  --info: #1565c0;
+  --chart-1: #16a34a;
+  --chart-2: #1f77b4;
+  --chart-3: #e8a33d;
+  --chart-4: #7d5fb2;
+  --chart-5: #c94f4f;
+  --chart-6: #0e9aa7;
+  --chart-surface: #ffffff;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mono: Consolas, 'Cascadia Mono', monospace;
+  --row-h: 22px;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --bg: #1b1d22;
+  --bg-panel: #22252b;
+  --bg-raised: #2a2e35;
+  --bg-hover: #323741;
+  --bg-selected: #1d4a2e;
+  --bg-header: #2a2e35;
+  --bg-row-alt: #25282e;
+  --border: #383d46;
+  --text: #e6e8eb;
+  --text-muted: #9aa1ab;
+  --accent: #22c55e;
+  --accent-text: #052e16;
+  --tab-active: #22252b;
+  --danger: #e5534b;
+  --warning: #d29922;
+  --info: #58a6ff;
+  --chart-1: #22c55e;
+  --chart-2: #3b8be0;
+  --chart-3: #b8861c;
+  --chart-4: #9467d8;
+  --chart-5: #e0574d;
+  --chart-6: #1aa3ae;
+  --chart-surface: #22252b;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 13px/1.4 var(--font);
+  overflow: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  background: var(--bg-hover);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+input[type='text'],
+input[type='number'],
+input[type='search'],
+select,
+textarea {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}

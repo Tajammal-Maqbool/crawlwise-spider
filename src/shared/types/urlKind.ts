@@ -1,0 +1,12 @@
+export type UrlKind =
+  | 'html'
+  | 'javascript'
+  | 'css'
+  | 'image'
+  | 'media'
+  | 'font'
+  | 'xml'
+  | 'pdf'
+  | 'plugin'
+  | 'other'
+  | 'unknown'

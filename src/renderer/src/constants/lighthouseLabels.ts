@@ -1,0 +1,1 @@
+export const LIGHTHOUSE_LABELS = new Set(['Performance Score', 'Largest Contentful Paint (ms)', 'First Contentful Paint (ms)', 'Total Blocking Time (ms)', 'Speed Index (ms)', 'Cumulative Layout Shift', 'Field Data (CrUX)', 'PSI Request Status'])

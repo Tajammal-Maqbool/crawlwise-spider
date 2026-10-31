@@ -1,0 +1,43 @@
+{
+  "name": "crawlwise",
+  "productName": "Crawlwise",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Desktop website crawler for technical SEO audits.",
+  "main": "out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "start": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run",
+    "test:e2e": "electron-vite build && vitest run --config vitest.e2e.config.mts",
+    "cli": "node out/main/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "electron": "^44.9.2",
+    "electron-vite": "^6.0.0",
+    "playwright-core": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.0.0",
+    "@tanstack/react-virtual": "^3.14.21",
+    "axe-core": "^4.14.0",
+    "cheerio": "^1.2.0",
+    "domhandler": "^5.0.3",
+    "exceljs": "^4.4.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "robots-parser": "^3.0.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
+  }
+}

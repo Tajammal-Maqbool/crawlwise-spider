@@ -22,6 +22,21 @@ export class RenderPool {
   constructor(private readonly maxWindows: () => number) {
     this.ses = session.fromPartition(PARTITION)
     this.ses.on('will-download', (_e, item) => item.cancel())
+    this.ses.setPermissionRequestHandler((_wc, _permission, callback) => callback(false))
+    this.ses.setPermissionCheckHandler(() => false)
+    this.ses.setDevicePermissionHandler(() => false)
+    this.ses.on('select-hid-device', (event, _details, callback) => {
+      event.preventDefault()
+      callback()
+    })
+    this.ses.on('select-serial-port', (event, _portList, _wc, callback) => {
+      event.preventDefault()
+      callback('')
+    })
+    this.ses.on('select-usb-device', (event, _details, callback) => {
+      event.preventDefault()
+      callback()
+    })
     this.ses.webRequest.onBeforeRequest((details, callback) => {
       const state = details.webContentsId !== undefined ? this.states.get(details.webContentsId) : undefined
       if (state) {

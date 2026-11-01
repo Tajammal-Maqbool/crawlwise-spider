@@ -1,5 +1,6 @@
 import { gunzipSync } from 'node:zlib'
 import { normalizeUrl } from '@shared/utils/normalizeUrl'
+import { MAX_SITEMAP_DECOMPRESSED_BYTES } from '../constants/sitemap'
 
 export interface ParsedSitemap {
   isIndex: boolean
@@ -11,8 +12,8 @@ export function looksLikeSitemap(body: Buffer): boolean {
   return /<(urlset|sitemapindex)[\s>]/i.test(head) || isGzip(body)
 }
 
-export function parseSitemap(body: Buffer, sitemapUrl: string): ParsedSitemap | null {
-  const raw = isGzip(body) ? safeGunzip(body) : body
+export function parseSitemap(body: Buffer, sitemapUrl: string, maxOutputLength = MAX_SITEMAP_DECOMPRESSED_BYTES): ParsedSitemap | null {
+  const raw = isGzip(body) ? safeGunzip(body, maxOutputLength) : body
   if (!raw) return null
   const xml = raw.toString('utf8')
   const isIndex = /<sitemapindex[\s>]/i.test(xml)
@@ -27,9 +28,9 @@ function isGzip(body: Buffer): boolean {
   return body.length > 2 && body[0] === 0x1f && body[1] === 0x8b
 }
 
-function safeGunzip(body: Buffer): Buffer | null {
+function safeGunzip(body: Buffer, maxOutputLength: number): Buffer | null {
   try {
-    return gunzipSync(body)
+    return gunzipSync(body, { maxOutputLength })
   } catch {
     return null
   }

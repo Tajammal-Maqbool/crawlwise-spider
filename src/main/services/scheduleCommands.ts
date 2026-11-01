@@ -1,5 +1,6 @@
 import type { ScheduledTask } from '@shared/interfaces/scheduledTask'
 import { APP_NAME, APP_SLUG } from '@shared/constants/appInfo'
+import { EXPORT_FORMATS, EXPORT_NAME_PATTERN } from '../constants/schedule'
 
 export const TASK_FOLDER = APP_SLUG
 
@@ -50,6 +51,8 @@ export function validateTask(task: ScheduledTask): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(task.date) || Number.isNaN(Date.parse(task.date))) return 'The date must be YYYY-MM-DD'
   if (!task.outputFolder.trim()) return 'Choose an output folder'
   if (/["\r\n%]/.test(task.startUrl + task.outputFolder)) return 'The URL and folder must not contain quotes, percent signs or line breaks'
+  if (!EXPORT_FORMATS.includes(task.format)) return 'The export format must be csv or xlsx'
+  if (![...task.exportTabs, ...task.bulkExports].every((name) => EXPORT_NAME_PATTERN.test(name))) return 'An export name contains characters that are not allowed'
   return null
 }
 

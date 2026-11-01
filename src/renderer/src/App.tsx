@@ -14,6 +14,8 @@ import { useFilterCounts } from './hooks/useFilterCounts'
 import { useGridPage } from './hooks/useGridPage'
 import { useUrlDetail } from './hooks/useUrlDetail'
 import { useStoredConfig } from './hooks/useStoredConfig'
+import { useDebouncedValue } from './hooks/useDebouncedValue'
+import { SEARCH_DEBOUNCE_MS } from './constants/searchDebounce'
 import { SECRETS_NOT_SAVED_MESSAGE } from './constants/secretMessages'
 import { useTheme } from './hooks/useTheme'
 import { COLUMN_LAYOUT_PREFIX, useColumnLayout } from './hooks/useColumnLayout'
@@ -68,7 +70,8 @@ export function App() {
   const tick = useRefreshTick(live, `${crawlId}:${progress?.state ?? ''}`) + refresh
   const counts = useFilterCounts(crawlId, tick)
   const tabKey = FILTERS_BY_KEY[filterKey].tabKey
-  const grid = useGridPage({ crawlId, filterKey, sortKey, sortDirection, search, tick })
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)
+  const grid = useGridPage({ crawlId, filterKey, sortKey, sortDirection, search: debouncedSearch, tick })
   const detail = useUrlDetail(crawlId, selectedId)
   const layout = useColumnLayout(tabKey, columnReset)
 

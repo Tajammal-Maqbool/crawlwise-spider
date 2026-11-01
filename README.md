@@ -57,7 +57,7 @@ Get the latest Windows build from the [Releases page](https://github.com/Tajamma
 | File | Use it when |
 | --- | --- |
 | `Crawlwise-Spider-Setup-<version>.exe` | You want to install the app with Start menu and desktop shortcuts. |
-| `Crawlwise-Spider-<version>-portable.exe` | You want to run the app without installing it, for example from a USB drive. |
+| `Crawlwise-Spider-<version>-portable.exe` | You want to run the app without installing it, for example from a USB drive. Scheduled crawls and the CLI need the installer. |
 
 The builds are not code-signed yet. Windows SmartScreen can show "Windows protected your PC". Click **More info**, then **Run anyway**.
 
@@ -110,12 +110,22 @@ Enter a URL in the address bar and click **Start**.
 
 ## Command line
 
-Build the app first. Then run a crawl without the user interface:
+Run a crawl without the user interface.
+
+**Installed app:** the installer puts `crawlwise-cli.cmd` in the `resources` folder of the install folder. The default install folder is `%LOCALAPPDATA%\Programs\Crawlwise Spider`.
+
+```bat
+"%LOCALAPPDATA%\Programs\Crawlwise Spider\resources\crawlwise-cli.cmd" --crawl https://example.com --output-folder .\crawl --export-format xlsx
+```
+
+**From source:** build the app first.
 
 ```bash
 npm run build
 npm run cli -- --crawl https://example.com --output-folder ./crawl --export-tabs "page-titles:missing" --export-format xlsx
 ```
+
+The portable exe has no CLI and cannot run scheduled crawls. Use the installer for those features.
 
 | Option | Description |
 | --- | --- |

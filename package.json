@@ -70,6 +70,12 @@
     },
     "portable": {
       "artifactName": "Crawlwise-Spider-${version}-portable.${ext}"
-    }
+    },
+    "extraResources": [
+      {
+        "from": "packaging/crawlwise-cli.cmd",
+        "to": "crawlwise-cli.cmd"
+      }
+    ]
   }
 }

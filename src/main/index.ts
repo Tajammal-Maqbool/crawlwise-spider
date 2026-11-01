@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell } from 'electron'
 import { join } from 'node:path'
+import { pathToFileURL } from 'node:url'
 import { IPC } from '@shared/constants/ipcChannels'
 import { CrawlLibrary } from './services/crawlLibrary'
 import { CrawlManager } from './services/crawlManager'
@@ -13,12 +14,30 @@ import { electronSecretCodec } from './services/electronSecretCodec'
 import { googleEndpointsFor } from './utils/googleEndpointsFor'
 import { GOOGLE_API_BASE_ENV } from './constants/google'
 import { APP_NAME } from '@shared/constants/appInfo'
+import { LEGACY_APP_NAMES } from './constants/legacyAppNames'
+import { migrateUserData } from './services/migrateUserData'
+import { isAppUrl } from './utils/isAppUrl'
 
 let mainWindow: BrowserWindow | null = null
 
 app.setName(APP_NAME)
 const userDataArg = process.argv.find((a) => a.startsWith('--user-data-dir='))
 if (userDataArg) app.setPath('userData', userDataArg.slice('--user-data-dir='.length))
+else {
+  try {
+    migrateUserData(app.getPath('appData'), app.getPath('userData'), LEGACY_APP_NAMES)
+  } catch (err) {
+    console.error('User data migration failed', err)
+  }
+}
+
+// Requested after the userData path is final: the lock is scoped to that folder, so e2e runs with their own --user-data-dir do not collide.
+if (!app.requestSingleInstanceLock()) app.quit()
+app.on('second-instance', () => {
+  if (!mainWindow) return
+  if (mainWindow.isMinimized()) mainWindow.restore()
+  mainWindow.focus()
+})
 
 function createWindow(): BrowserWindow {
   const window = new BrowserWindow({
@@ -44,8 +63,15 @@ function createWindow(): BrowserWindow {
     if (/^https?:/.test(url)) void shell.openExternal(url)
     return { action: 'deny' }
   })
+  const rendererFile = join(__dirname, '../renderer/index.html')
+  const appUrl = process.env.ELECTRON_RENDERER_URL ?? pathToFileURL(rendererFile).href
+  window.webContents.on('will-navigate', (event, url) => {
+    if (isAppUrl(url, appUrl)) return
+    event.preventDefault()
+    if (/^https?:/.test(url)) void shell.openExternal(url)
+  })
   if (process.env.ELECTRON_RENDERER_URL) void window.loadURL(process.env.ELECTRON_RENDERER_URL)
-  else void window.loadFile(join(__dirname, '../renderer/index.html'))
+  else void window.loadFile(rendererFile)
   return window
 }
 

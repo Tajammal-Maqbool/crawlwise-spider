@@ -6,6 +6,7 @@ import { promisify } from 'node:util'
 import type { CrawlConfig } from '@shared/interfaces/crawlConfig'
 import type { ScheduledTask, ScheduledTaskInput } from '@shared/interfaces/scheduledTask'
 import { redactSecrets } from '@shared/utils/redactSecrets'
+import { validateScheduleEnvironment } from './scheduleRules'
 import { buildCmdFile, buildCreateArgs, buildDeleteArgs, buildTaskXml, validateTask } from './scheduleCommands'
 
 const run = promisify(execFile)
@@ -28,6 +29,8 @@ export class Scheduler {
 
   async create(input: ScheduledTaskInput, config: CrawlConfig): Promise<ScheduledTask> {
     if (process.platform !== 'win32') throw new Error('Scheduling uses Windows Task Scheduler and works on Windows only.')
+    const environmentProblem = validateScheduleEnvironment(config, process.env)
+    if (environmentProblem) throw new Error(environmentProblem)
     const task: ScheduledTask = { ...input, id: randomUUID(), createdAt: new Date().toISOString() }
     const problem = validateTask(task)
     if (problem) throw new Error(problem)

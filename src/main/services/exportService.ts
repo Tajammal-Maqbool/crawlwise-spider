@@ -3,18 +3,14 @@ import { COLUMNS } from '@shared/constants/columns'
 import { BULK_EXPORTS, ISSUES_REPORT_KEY } from '@shared/constants/bulkExports'
 import { FILTERS, FILTERS_BY_KEY, TABS_BY_KEY } from '@shared/constants/filterRegistry'
 import type { CrawlThresholds } from '@shared/interfaces/crawlConfig'
-import { countFilters } from '../db/queryService'
+import { countFilters, prepareFilterRows } from '../db/queryService'
 import { countedRows } from '../utils/countedRows'
 import { writeTable } from './tableWriter'
 
 export async function exportFilter(db: DatabaseSync, filterKey: string, thresholds: CrawlThresholds, path: string): Promise<number> {
-  const filter = FILTERS_BY_KEY[filterKey]
-  if (!filter) throw new Error(`Unknown filter: ${filterKey}`)
-  const columns = TABS_BY_KEY[filter.tabKey].columns
-  const select = columns.map((k) => `${COLUMNS[k].sql} AS "${k}"`).join(', ')
-  const statement = db.prepare(`SELECT ${select} FROM urls u WHERE ${filter.where(thresholds)} ORDER BY u.id`)
+  const { columns, tabLabel, statement } = prepareFilterRows(db, filterKey, thresholds)
   const counter = countedRows(statement.iterate() as Iterable<Record<string, unknown>>, (r) => columns.map((k) => r[k]))
-  await writeTable(path, TABS_BY_KEY[filter.tabKey].label, columns.map((k) => COLUMNS[k].label), counter.rows)
+  await writeTable(path, tabLabel, columns.map((k) => COLUMNS[k].label), counter.rows)
   return counter.count()
 }
 

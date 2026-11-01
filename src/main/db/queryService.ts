@@ -4,6 +4,7 @@ import { COLUMNS } from '@shared/constants/columns'
 import type { CrawlThresholds } from '@shared/interfaces/crawlConfig'
 import type { FilterCounts } from '@shared/interfaces/filterCount'
 import type { GridPage, GridQuery } from '@shared/interfaces/gridQuery'
+import type { FilterRowsQuery } from '../interfaces/filterRowsQuery'
 
 export function countFilters(db: DatabaseSync, thresholds: CrawlThresholds): FilterCounts {
   const counts: FilterCounts = {}
@@ -34,11 +35,16 @@ export function queryPage(db: DatabaseSync, query: GridQuery, thresholds: CrawlT
   return { columns, rows, total }
 }
 
-export function queryAllRows(db: DatabaseSync, filterKey: string, thresholds: CrawlThresholds): GridPage {
+export function prepareFilterRows(db: DatabaseSync, filterKey: string, thresholds: CrawlThresholds): FilterRowsQuery {
   const filter = FILTERS_BY_KEY[filterKey]
   if (!filter) throw new Error(`Unknown filter: ${filterKey}`)
-  const columns = TABS_BY_KEY[filter.tabKey].columns
-  const select = columns.map((k) => `${COLUMNS[k].sql} AS "${k}"`).join(', ')
-  const rows = db.prepare(`SELECT ${select} FROM urls u WHERE ${filter.where(thresholds)} ORDER BY u.id`).all() as Array<Record<string, unknown>>
+  const tab = TABS_BY_KEY[filter.tabKey]
+  const select = tab.columns.map((k) => `${COLUMNS[k].sql} AS "${k}"`).join(', ')
+  return { columns: tab.columns, tabLabel: tab.label, statement: db.prepare(`SELECT ${select} FROM urls u WHERE ${filter.where(thresholds)} ORDER BY u.id`) }
+}
+
+export function queryAllRows(db: DatabaseSync, filterKey: string, thresholds: CrawlThresholds): GridPage {
+  const { columns, statement } = prepareFilterRows(db, filterKey, thresholds)
+  const rows = statement.all() as Array<Record<string, unknown>>
   return { columns, rows, total: rows.length }
 }

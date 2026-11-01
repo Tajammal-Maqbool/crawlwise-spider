@@ -1,14 +1,20 @@
+import { useRef } from 'react'
 import type { RowContextMenuProps } from '../../interfaces/gridProps'
 import { Button } from '../common/Button'
 import { api } from '../../services/ipc/api'
+import { useDismiss } from '../../hooks/useDismiss'
+import { useViewportClamp } from '../../hooks/useViewportClamp'
 
 export function RowContextMenu({ url, x, y, onShowLinks, onClose }: RowContextMenuProps) {
+  const menuRef = useRef<HTMLDivElement>(null)
+  const position = useViewportClamp(menuRef, x, y)
+  useDismiss(menuRef, onClose)
   const act = (work: () => void) => () => {
     work()
     onClose()
   }
   return (
-    <div className="popup menu-dropdown" style={{ left: x, top: y }} role="menu" onMouseLeave={onClose}>
+    <div ref={menuRef} className="popup menu-dropdown" style={{ left: position.x, top: position.y }} role="menu" onMouseLeave={onClose}>
       <Button role="menuitem" className="menu-item" onClick={act(() => void api.copyText(url))}>
         Copy URL
       </Button>

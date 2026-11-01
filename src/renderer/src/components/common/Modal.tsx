@@ -1,20 +1,17 @@
-import { useEffect } from 'react'
+import { useId, useRef } from 'react'
 import type { ModalProps } from '../../interfaces/dialogProps'
+import { useFocusTrap } from '../../hooks/useFocusTrap'
 import { Button } from './Button'
 
 export function Modal({ title, onClose, footer, children }: ModalProps) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const titleId = useId()
+  useFocusTrap(dialogRef, onClose)
   return (
     <div className="modal-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="modal" ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}>
         <header>
-          <h2>{title}</h2>
+          <h2 id={titleId}>{title}</h2>
           <Button aria-label="Close" onClick={onClose}>
             {'✕'}
           </Button>

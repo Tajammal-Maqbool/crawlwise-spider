@@ -801,6 +801,10 @@ pre.source {
   color: var(--text-muted);
 }
 
+.about-body {
+  padding: 16px 18px;
+}
+
 .about-logo {
   display: block;
   margin-bottom: 12px;

@@ -18,6 +18,7 @@ import { processPage } from './pageProcessor'
 import { shouldFetch } from './linkPolicy'
 import { runPostCrawlAnalysis } from './postCrawlAnalysis'
 import { ProgressMeter } from './progressMeter'
+import { effectiveDelayMs } from '../utils/effectiveDelayMs'
 import { resolveKind } from './responseFields'
 import type { PageRenderer } from '../interfaces/renderResult'
 import { runEnrichment } from '../integrations/enrichment'
@@ -63,7 +64,7 @@ export class CrawlEngine {
       maxBytes: config.limits.maxPageSizeKb * 1024,
       extraHeaders: config.extraHeaders
     }
-    this.robots = new RobotsCache(this.fetchOptions)
+    this.robots = new RobotsCache(this.fetchOptions, this.throttle, (origin, status) => this.warnRobotsUnavailable(origin, status))
     this.scope = new CrawlScope(config, this.seedUrls()[0] ?? 'http://invalid.local/')
   }
 
@@ -72,6 +73,7 @@ export class CrawlEngine {
     try {
       if (resume) this.urls.requeueInProgress()
       else await this.seed()
+      this.meter.start(this.urls.counts().crawled)
       this.setState('crawling')
       await this.importGoogle()
       await this.loop()
@@ -82,7 +84,7 @@ export class CrawlEngine {
         markMissingGoogleData(this.db)
         this.warnings.push(...(await runEnrichment(this.db, this.config, this.google, (m) => (this.message = m || null), () => this.state === 'stopped')))
         runPostCrawlAnalysis(this.db, this.scope.host, this.config)
-        this.setState('completed')
+        if (!this.wasStopped()) this.setState('completed')
         this.message = this.warnings.length > 0 ? this.warnings.join(' | ') : null
       } else {
         runPostCrawlAnalysis(this.db, this.scope.host, this.config)
@@ -143,6 +145,9 @@ export class CrawlEngine {
   private async process(q: QueuedUrl): Promise<void> {
     if (this.config.respectRobotsTxt) {
       const decision = await this.robots.check(q.url)
+      if (decision.crawlDelaySeconds !== null) {
+        this.throttle.setMinInterval(new URL(q.url).host, effectiveDelayMs(this.config.speed.maxUrlsPerSecond, decision.crawlDelaySeconds))
+      }
       if (!decision.allowed) {
         this.urls.update(q.id, {
           state: 3,
@@ -257,8 +262,19 @@ export class CrawlEngine {
     wake?.()
   }
 
+  private wasStopped(): boolean {
+    return this.state === 'stopped'
+  }
+
+  private warnRobotsUnavailable(origin: string, status: number): void {
+    const warning = `robots.txt for ${origin} could not be fetched (${status === 0 ? 'network error' : `HTTP ${status}`}), so the host is treated as disallowed`
+    this.warnings.push(warning)
+    this.message = warning
+  }
+
   private setState(state: CrawlState): void {
     this.state = state
+    this.meter.setActive(state === 'crawling')
     writeMeta(this.db, 'state', state)
   }
 
@@ -268,7 +284,7 @@ export class CrawlEngine {
       crawlId: this.crawlId,
       state: this.state,
       ...counts,
-      urlsPerSecond: this.state === 'crawling' ? this.meter.rate(counts.crawled) : 0,
+      urlsPerSecond: this.meter.average(counts.crawled),
       activeThreads: this.inFlight,
       dbSizeBytes: this.fileSize(),
       message: this.message

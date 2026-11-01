@@ -3,8 +3,9 @@ import { usePanelData } from '../../hooks/usePanelData'
 import { api } from '../../services/ipc/api'
 
 export function ApiPanel({ crawlId, tick }: PanelDataProps) {
-  const { data, error } = usePanelData(crawlId, tick, api.getApiStatus)
+  const { data, loading, error } = usePanelData(crawlId, tick, api.getApiStatus)
   if (error) return <div className="error-banner">{error}</div>
+  if (loading) return <p className="grid-empty">Loading...</p>
   if (!data || data.length === 0) return <p className="grid-empty">No API data in this crawl. Connect APIs in Configuration &gt; API Access.</p>
   return (
     <div className="panel-body">

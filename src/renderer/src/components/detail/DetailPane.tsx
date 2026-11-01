@@ -14,8 +14,10 @@ import { RenderedPageTab } from './RenderedPageTab'
 import { SourceTab } from './SourceTab'
 import { StructuredDataTab } from './StructuredDataTab'
 
-export function DetailPane({ detail, config, tab, onTabChange }: DetailPaneProps) {
+export function DetailPane({ detail, loading, error, config, tab, onTabChange }: DetailPaneProps) {
   const body = () => {
+    if (error) return <div className="error-banner">{error}</div>
+    if (loading) return <p className="grid-empty">Loading URL details...</p>
     if (!detail) return <p className="grid-empty">Select a URL in the table to see its details.</p>
     const props = { detail, config }
     switch (tab) {

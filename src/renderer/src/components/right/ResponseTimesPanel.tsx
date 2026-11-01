@@ -4,8 +4,9 @@ import { api } from '../../services/ipc/api'
 import { BarChart } from '../charts/BarChart'
 
 export function ResponseTimesPanel({ crawlId, tick }: PanelDataProps) {
-  const { data, error } = usePanelData(crawlId, tick, api.getResponseTimes)
+  const { data, loading, error } = usePanelData(crawlId, tick, api.getResponseTimes)
   if (error) return <div className="error-banner">{error}</div>
+  if (loading) return <p className="grid-empty">Loading...</p>
   if (!data || data.buckets.every((b) => b.urls === 0)) return <p className="grid-empty">No crawl data yet.</p>
   return (
     <div className="panel-body">

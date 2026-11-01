@@ -227,7 +227,7 @@ export function App() {
             />
           )}
           <Splitter orientation="horizontal" cssVar="--detail-h" min={120} max={700} invert />
-          <DetailPane detail={detail} config={viewConfig} tab={detailTab} onTabChange={setDetailTab} />
+          <DetailPane detail={detail.data} loading={detail.loading} error={detail.error} config={viewConfig} tab={detailTab} onTabChange={setDetailTab} />
         </div>
         <Splitter orientation="vertical" cssVar="--right-w" min={220} max={700} invert />
         <RightPanel counts={counts} config={viewConfig} crawlId={crawlId} tick={tick} onSelectFilter={selectFilter} />

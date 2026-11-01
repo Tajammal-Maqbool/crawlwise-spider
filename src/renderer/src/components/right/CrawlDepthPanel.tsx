@@ -4,8 +4,9 @@ import { api } from '../../services/ipc/api'
 import { BarChart } from '../charts/BarChart'
 
 export function CrawlDepthPanel({ crawlId, tick }: PanelDataProps) {
-  const { data, error } = usePanelData(crawlId, tick, api.getDepthStats)
+  const { data, loading, error } = usePanelData(crawlId, tick, api.getDepthStats)
   if (error) return <div className="error-banner">{error}</div>
+  if (loading) return <p className="grid-empty">Loading...</p>
   if (!data || data.length === 0) return <p className="grid-empty">No crawl data yet.</p>
   return (
     <div className="panel-body">

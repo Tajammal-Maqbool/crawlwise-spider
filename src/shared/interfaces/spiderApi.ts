@@ -8,6 +8,7 @@ import type { UrlDetail } from './urlDetail'
 import type { SiteStructure } from './siteStructure'
 import type { ScheduledTask, ScheduledTaskInput } from './scheduledTask'
 import type { ChangeRow, CrawlComparison, DiffCategory } from './crawlComparison'
+import type { SecretsStatus, StoredSecrets } from './storedSecrets'
 import type { GoogleAccountStatus, GoogleProperty } from './googleAccount'
 import type { ApiStatusRow, DepthStat, ResponseTimeStats } from './crawlStats'
 import type { TreeRow } from './treeRow'
@@ -43,5 +44,7 @@ export interface SpiderApi {
   disconnectGoogle(): Promise<GoogleAccountStatus>
   listSearchConsoleSites(): Promise<GoogleProperty[]>
   listAnalyticsProperties(): Promise<GoogleProperty[]>
+  getSecrets(): Promise<SecretsStatus>
+  saveSecrets(secrets: StoredSecrets): Promise<SecretsStatus>
   onProgress(listener: (progress: CrawlProgress) => void): () => void
 }

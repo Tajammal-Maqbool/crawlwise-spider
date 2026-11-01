@@ -34,6 +34,8 @@ const api: SpiderApi = {
   disconnectGoogle: () => ipcRenderer.invoke(IPC.googleDisconnect),
   listSearchConsoleSites: () => ipcRenderer.invoke(IPC.googleSites),
   listAnalyticsProperties: () => ipcRenderer.invoke(IPC.googleProperties),
+  getSecrets: () => ipcRenderer.invoke(IPC.secretsGet),
+  saveSecrets: (secrets) => ipcRenderer.invoke(IPC.secretsSave, secrets),
   onProgress: (listener) => {
     const handler = (_e: IpcRendererEvent, progress: CrawlProgress) => listener(progress)
     ipcRenderer.on(IPC.crawlProgress, handler)

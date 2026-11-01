@@ -14,6 +14,7 @@ import { useFilterCounts } from './hooks/useFilterCounts'
 import { useGridPage } from './hooks/useGridPage'
 import { useUrlDetail } from './hooks/useUrlDetail'
 import { useStoredConfig } from './hooks/useStoredConfig'
+import { SECRETS_NOT_SAVED_MESSAGE } from './constants/secretMessages'
 import { useTheme } from './hooks/useTheme'
 import { COLUMN_LAYOUT_PREFIX, useColumnLayout } from './hooks/useColumnLayout'
 import { useMenuCommands } from './hooks/useMenuCommands'
@@ -41,7 +42,7 @@ const LIVE_STATES = new Set(['crawling', 'paused', 'analysing'])
 const MODE_LABELS: Record<UiMode, string> = { spider: 'Spider', list: 'List', compare: 'Compare' }
 
 export function App() {
-  const [config, setConfig] = useStoredConfig()
+  const { config, setConfig, secretsPersistent } = useStoredConfig()
   const [theme, setTheme] = useTheme()
   const [uiMode, setUiMode] = useState<UiMode>(config.mode === 'list' ? 'list' : 'spider')
   const [crawlId, setCrawlId] = useState<string | null>(null)
@@ -192,6 +193,7 @@ export function App() {
           <div>
             {error && <div className="error-banner">{error}</div>}
             {notice && <div className="info-banner">{notice}</div>}
+            {!secretsPersistent && <div className="info-banner">{SECRETS_NOT_SAVED_MESSAGE}</div>}
             <GridToolbar
               filterKey={filterKey}
               config={viewConfig}

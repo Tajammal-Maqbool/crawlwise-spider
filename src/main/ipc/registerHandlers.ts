@@ -10,6 +10,7 @@ import { getApiStatus, getDepthStats, getResponseTimes } from '../db/statsServic
 import { getTreeRows } from '../db/treeService'
 import { reanalyseCrawl } from '../services/crawlAnalysis'
 import { registerCompareHandlers } from './registerCompareHandlers'
+import { registerSecretHandlers } from './registerSecretHandlers'
 import { BULK_EXPORTS, ISSUES_REPORT_KEY } from '@shared/constants/bulkExports'
 import { defaultExportName, exportBulk, exportFilter, filterExportLabel } from '../services/exportService'
 import type { CrawlLibrary } from '../services/crawlLibrary'
@@ -40,6 +41,7 @@ export function registerHandlers(library: CrawlLibrary, manager: CrawlManager, s
   ipcMain.handle(IPC.dataDetail, (_e, id: string, urlId: number) => getUrlDetail(library.reader(id), urlId))
 
   registerCompareHandlers(library)
+  registerSecretHandlers()
   ipcMain.handle(IPC.dataStructure, (_e, id: string) => getSiteStructure(library.reader(id)))
   ipcMain.handle(IPC.dataDepthStats, (_e, id: string) => getDepthStats(library.reader(id)))
   ipcMain.handle(IPC.dataResponseTimes, (_e, id: string) => getResponseTimes(library.reader(id)))

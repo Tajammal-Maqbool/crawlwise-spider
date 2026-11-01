@@ -1,0 +1,1 @@
+export const MAX_ROBOTS_CRAWL_DELAY_SECONDS = 30

@@ -9,14 +9,20 @@ import { mergeConfig } from '@shared/utils/mergeConfig'
 import { redactSecrets } from '@shared/utils/redactSecrets'
 import { openCrawlDb } from '../db/openCrawlDb'
 import { readMeta, writeMeta } from '../db/metaRepository'
+import { recoverStaleState } from '../utils/staleCrawlState'
 
 const EXTENSION = '.seospider.sqlite'
 
 export class CrawlLibrary {
   private readonly readers = new Map<string, DatabaseSync>()
+  private isLive: (id: string) => boolean = () => false
 
   constructor(private readonly dir: string) {
     mkdirSync(dir, { recursive: true })
+  }
+
+  setLiveCheck(isLive: (id: string) => boolean): void {
+    this.isLive = isLive
   }
 
   pathOf(id: string): string {
@@ -41,6 +47,7 @@ export class CrawlLibrary {
     if (!db) {
       db = openCrawlDb(this.pathOf(id))
       this.readers.set(id, db)
+      this.recoverState(db, id)
     }
     return db
   }
@@ -70,6 +77,13 @@ export class CrawlLibrary {
     this.readers.clear()
   }
 
+  private recoverState(db: DatabaseSync, id: string): CrawlState {
+    const stored = readMeta(db, 'state') ?? 'idle'
+    const state = recoverStaleState(stored, this.isLive(id))
+    if (state !== stored) writeMeta(db, 'state', state)
+    return state
+  }
+
   private summary(id: string): CrawlSummary | null {
     try {
       const db = this.reader(id)
@@ -80,7 +94,7 @@ export class CrawlLibrary {
         id,
         startUrl: readMeta(db, 'start_url') ?? '',
         mode: (readMeta(db, 'mode') ?? 'spider') as CrawlMode,
-        state: (readMeta(db, 'state') ?? 'idle') as CrawlState,
+        state: this.recoverState(db, id),
         createdAt: readMeta(db, 'created_at') ?? '',
         urlCount: count.n,
         fileSizeBytes: statSync(path).size + (existsSync(wal) ? statSync(wal).size : 0)

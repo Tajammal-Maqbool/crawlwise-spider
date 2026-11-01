@@ -18,7 +18,9 @@ export class CrawlManager {
     private readonly renderPool: RenderPool,
     private readonly setRenderWindows: (count: number) => void,
     private readonly google: GoogleApiContext
-  ) {}
+  ) {
+    this.library.setLiveCheck((id) => this.isActive(id))
+  }
 
   start(config: CrawlConfig): string {
     this.ensureIdle()

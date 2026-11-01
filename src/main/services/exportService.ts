@@ -3,24 +3,28 @@ import { COLUMNS } from '@shared/constants/columns'
 import { BULK_EXPORTS, ISSUES_REPORT_KEY } from '@shared/constants/bulkExports'
 import { FILTERS, FILTERS_BY_KEY, TABS_BY_KEY } from '@shared/constants/filterRegistry'
 import type { CrawlThresholds } from '@shared/interfaces/crawlConfig'
-import { countFilters, queryAllRows } from '../db/queryService'
+import { countFilters } from '../db/queryService'
+import { countedRows } from '../utils/countedRows'
 import { writeTable } from './tableWriter'
 
 export async function exportFilter(db: DatabaseSync, filterKey: string, thresholds: CrawlThresholds, path: string): Promise<number> {
-  const page = queryAllRows(db, filterKey, thresholds)
-  const header = page.columns.map((k) => COLUMNS[k].label)
-  const rows = page.rows.map((r) => page.columns.map((k) => r[k]))
-  await writeTable(path, TABS_BY_KEY[FILTERS_BY_KEY[filterKey].tabKey].label, header, rows)
-  return rows.length
+  const filter = FILTERS_BY_KEY[filterKey]
+  if (!filter) throw new Error(`Unknown filter: ${filterKey}`)
+  const columns = TABS_BY_KEY[filter.tabKey].columns
+  const select = columns.map((k) => `${COLUMNS[k].sql} AS "${k}"`).join(', ')
+  const statement = db.prepare(`SELECT ${select} FROM urls u WHERE ${filter.where(thresholds)} ORDER BY u.id`)
+  const counter = countedRows(statement.iterate() as Iterable<Record<string, unknown>>, (r) => columns.map((k) => r[k]))
+  await writeTable(path, TABS_BY_KEY[filter.tabKey].label, columns.map((k) => COLUMNS[k].label), counter.rows)
+  return counter.count()
 }
 
 export async function exportBulk(db: DatabaseSync, key: string, thresholds: CrawlThresholds, path: string): Promise<number> {
   if (key === ISSUES_REPORT_KEY) return exportIssues(db, thresholds, path)
   const def = BULK_EXPORTS.find((b) => b.key === key)
   if (!def) throw new Error(`Unknown export: ${key}`)
-  const rows = (db.prepare(def.sql).all() as Array<Record<string, unknown>>).map((r) => Object.values(r))
-  await writeTable(path, def.label, def.header, rows)
-  return rows.length
+  const counter = countedRows(db.prepare(def.sql).iterate() as Iterable<Record<string, unknown>>, (r) => Object.values(r))
+  await writeTable(path, def.label, def.header, counter.rows)
+  return counter.count()
 }
 
 async function exportIssues(db: DatabaseSync, thresholds: CrawlThresholds, path: string): Promise<number> {

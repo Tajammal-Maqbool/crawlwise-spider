@@ -17,6 +17,7 @@ export function GridHeader({ layout, sortKey, sortDirection, onSort, onChooseCol
     const up = () => {
       window.removeEventListener('pointermove', move)
       window.removeEventListener('pointerup', up)
+      layout.persist()
     }
     window.addEventListener('pointermove', move)
     window.addEventListener('pointerup', up)

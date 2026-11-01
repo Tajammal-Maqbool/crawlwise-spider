@@ -9,6 +9,7 @@ export interface ColumnLayoutState {
   visible: string[]
   widthOf: (key: string) => number
   resize: (key: string, width: number) => void
+  persist: () => void
   move: (key: string, beforeKey: string) => void
   toggle: (key: string) => void
 }

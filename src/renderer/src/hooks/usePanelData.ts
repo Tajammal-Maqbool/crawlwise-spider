@@ -1,24 +1,26 @@
 import { useEffect, useState } from 'react'
+import type { AsyncData } from '../interfaces/asyncData'
 import { ipcErrorMessage } from '../utils/ipcErrorMessage'
 
-export function usePanelData<T>(crawlId: string | null, tick: number, load: (crawlId: string) => Promise<T>): { data: T | null; error: string | null } {
-  const [data, setData] = useState<T | null>(null)
-  const [error, setError] = useState<string | null>(null)
+export function usePanelData<T>(crawlId: string | null, tick: number, load: (crawlId: string) => Promise<T>): AsyncData<T> {
+  const [state, setState] = useState<AsyncData<T>>({ data: null, loading: false, error: null })
 
   useEffect(() => {
-    if (!crawlId) {
-      setData(null)
-      return
-    }
+    setState({ data: null, loading: !!crawlId, error: null })
+  }, [crawlId])
+
+  useEffect(() => {
+    if (!crawlId) return
     let live = true
+    setState((s) => ({ ...s, loading: s.data === null }))
     load(crawlId).then(
-      (d) => live && (setData(d), setError(null)),
-      (err: unknown) => live && setError(ipcErrorMessage(err))
+      (data) => live && setState({ data, loading: false, error: null }),
+      (err: unknown) => live && setState((s) => ({ ...s, loading: false, error: ipcErrorMessage(err) }))
     )
     return () => {
       live = false
     }
   }, [crawlId, tick, load])
 
-  return { data, error }
+  return state
 }

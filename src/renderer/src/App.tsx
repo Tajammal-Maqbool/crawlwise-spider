@@ -14,6 +14,9 @@ import { useFilterCounts } from './hooks/useFilterCounts'
 import { useGridPage } from './hooks/useGridPage'
 import { useUrlDetail } from './hooks/useUrlDetail'
 import { useStoredConfig } from './hooks/useStoredConfig'
+import { useDebouncedValue } from './hooks/useDebouncedValue'
+import { SEARCH_DEBOUNCE_MS } from './constants/searchDebounce'
+import { SECRETS_NOT_SAVED_MESSAGE } from './constants/secretMessages'
 import { useTheme } from './hooks/useTheme'
 import { COLUMN_LAYOUT_PREFIX, useColumnLayout } from './hooks/useColumnLayout'
 import { useMenuCommands } from './hooks/useMenuCommands'
@@ -41,7 +44,7 @@ const LIVE_STATES = new Set(['crawling', 'paused', 'analysing'])
 const MODE_LABELS: Record<UiMode, string> = { spider: 'Spider', list: 'List', compare: 'Compare' }
 
 export function App() {
-  const [config, setConfig] = useStoredConfig()
+  const { config, setConfig, secretsPersistent } = useStoredConfig()
   const [theme, setTheme] = useTheme()
   const [uiMode, setUiMode] = useState<UiMode>(config.mode === 'list' ? 'list' : 'spider')
   const [crawlId, setCrawlId] = useState<string | null>(null)
@@ -67,7 +70,8 @@ export function App() {
   const tick = useRefreshTick(live, `${crawlId}:${progress?.state ?? ''}`) + refresh
   const counts = useFilterCounts(crawlId, tick)
   const tabKey = FILTERS_BY_KEY[filterKey].tabKey
-  const grid = useGridPage({ crawlId, filterKey, sortKey, sortDirection, search, tick })
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS)
+  const grid = useGridPage({ crawlId, filterKey, sortKey, sortDirection, search: debouncedSearch, tick })
   const detail = useUrlDetail(crawlId, selectedId)
   const layout = useColumnLayout(tabKey, columnReset)
 
@@ -192,6 +196,7 @@ export function App() {
           <div>
             {error && <div className="error-banner">{error}</div>}
             {notice && <div className="info-banner">{notice}</div>}
+            {!secretsPersistent && <div className="info-banner">{SECRETS_NOT_SAVED_MESSAGE}</div>}
             <GridToolbar
               filterKey={filterKey}
               config={viewConfig}
@@ -222,7 +227,7 @@ export function App() {
             />
           )}
           <Splitter orientation="horizontal" cssVar="--detail-h" min={120} max={700} invert />
-          <DetailPane detail={detail} config={viewConfig} tab={detailTab} onTabChange={setDetailTab} />
+          <DetailPane detail={detail.data} loading={detail.loading} error={detail.error} config={viewConfig} tab={detailTab} onTabChange={setDetailTab} />
         </div>
         <Splitter orientation="vertical" cssVar="--right-w" min={220} max={700} invert />
         <RightPanel counts={counts} config={viewConfig} crawlId={crawlId} tick={tick} onSelectFilter={selectFilter} />

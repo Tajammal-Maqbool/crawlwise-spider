@@ -39,6 +39,8 @@ export interface ListModeDialogProps {
 
 export interface DetailPaneProps {
   detail: UrlDetail | null
+  loading: boolean
+  error: string | null
   config: CrawlConfig
   tab: DetailTab
   onTabChange: (tab: DetailTab) => void

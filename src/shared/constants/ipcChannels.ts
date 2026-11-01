@@ -29,5 +29,7 @@ export const IPC = {
   googleConnect: 'google:connect',
   googleDisconnect: 'google:disconnect',
   googleSites: 'google:sites',
-  googleProperties: 'google:properties'
+  googleProperties: 'google:properties',
+  secretsGet: 'secrets:get',
+  secretsSave: 'secrets:save'
 } as const
